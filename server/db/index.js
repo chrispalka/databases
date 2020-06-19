@@ -11,5 +11,12 @@ var connection = mysql.createConnection({
   password: '',
   database: 'chat'
 });
-
+connection.connect(function(err) {
+  if (err) {
+    throw err;
+  }
+  console.log('**Connected to MySql Database!**')
+});
 module.exports = connection;
+
+//module.exports.connection = connection;

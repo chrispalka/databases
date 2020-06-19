@@ -3,7 +3,9 @@ var models = require('../models');
 module.exports = {
   messages: {
     get: function (req, res) {}, // a function which handles a get request for all messages
-    post: function (req, res) {} // a function which handles posting a message to the database
+    post: function (req, res) {
+
+    } // a function which handles posting a message to the database
   },
 
   users: {
@@ -13,5 +15,5 @@ module.exports = {
   }
 };
 
-// request -> app.js -> controller -> model parses and returns to controller -> controller hands back to client
+// request -> app.js -> routes.js -> controller/index.js -> model/index.js parses and returns to controller -> controller hands back to client
 // ending response in controller
