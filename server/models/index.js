@@ -13,3 +13,4 @@ module.exports = {
   }
 };
 
+// model will use the data pased from controller to form DB queries

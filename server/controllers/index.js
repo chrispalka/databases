@@ -13,3 +13,5 @@ module.exports = {
   }
 };
 
+// request -> app.js -> controller -> model parses and returns to controller -> controller hands back to client
+// ending response in controller

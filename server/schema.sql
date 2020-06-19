@@ -41,7 +41,6 @@ CREATE TABLE `messages` (
   `text` VARCHAR(300) DEFAULT 'NULL',
   `user_id` INTEGER NOT NULL,
   `room_id` INTEGER NOT NULL,
-  `created_at` TIMESTAMP NOT NULL,
   PRIMARY KEY (`id`)
 );
 
@@ -76,10 +75,10 @@ CREATE TABLE `friends` (
 -- Foreign Keys
 -- ---
 
-ALTER TABLE `messages` ADD FOREIGN KEY (user_id) REFERENCES `users` (`id`);
-ALTER TABLE `messages` ADD FOREIGN KEY (room_id) REFERENCES `rooms` (`id`);
-ALTER TABLE `friends` ADD FOREIGN KEY (user_id) REFERENCES `users` (`id`);
-ALTER TABLE `friends` ADD FOREIGN KEY (friend_id) REFERENCES `users` (`id`);
+-- ALTER TABLE `messages` ADD FOREIGN KEY (user_id) REFERENCES `users` (`id`);
+-- ALTER TABLE `messages` ADD FOREIGN KEY (room_id) REFERENCES `rooms` (`id`);
+-- ALTER TABLE `friends` ADD FOREIGN KEY (user_id) REFERENCES `users` (`id`);
+-- ALTER TABLE `friends` ADD FOREIGN KEY (friend_id) REFERENCES `users` (`id`);
 
 -- ---
 -- Table Properties
