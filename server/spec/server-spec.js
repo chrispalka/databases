@@ -39,9 +39,12 @@ describe('Persistent Node Chat Server', function() {
         method: 'POST',
         uri: 'http://127.0.0.1:3000/classes/messages',
         json: {
-          username: 'Valjean',
+          "text": "In mercy\'s name, three days is all I need.",
+          "user_id": 3,
+          "room_id": 3
+          /* username: 'Valjean',
           text: 'In mercy\'s name, three days is all I need.',
-          roomname: 'Hello'
+          roomname: 'Hello' */
         }
       }, function () {
         // Now if we look in the database, we should find the
@@ -53,9 +56,9 @@ describe('Persistent Node Chat Server', function() {
         var queryArgs = [];
 
         dbConnection.query(queryString, queryArgs, function(err, results) {
+          console.log('QUERY STRING!: ', queryString);
+          console.log('QUERY ARGS!: ', queryArgs);
           if (err) {
-            console.log('QUERY STRING!: ', queryString);
-            console.log('QUERY ARGS!: ', queryArgs);
             throw new Error('ERROR!', err);
           }
           // Should have one result:
@@ -84,6 +87,11 @@ describe('Persistent Node Chat Server', function() {
       // Now query the Node chat server and see if it returns
       // the message we just inserted:
       request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+
+        if (error) {
+          console.log('Error should output all db messages:', error);
+        }
+        console.log('Body ----', body);
         var messageLog = JSON.parse(body);
         console.log('messageLogs: ----->', messageLog);
         expect(messageLog[0].text).to.equal('Men like you can never change!');
