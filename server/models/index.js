@@ -61,7 +61,40 @@ module.exports = {
       });
 
     }
+  },
+
+  rooms: {
+    // Ditto as above.
+    get: function (callback) {
+      var queryString = `SELECT * FROM rooms;`;
+      db.query(queryString, (error, results) => {
+        if (error) {
+          console.log('Error inside models GET rooms: ', error);
+          callback(error, null)
+        } else {
+          console.log('Successfully able to GET rooms from db inside models: 👍👑', results);
+          callback(null, results);
+        }
+      });
+    },
+    post: function (params, callback) {
+      console.log('POST users model params: ', params);
+      var paramsArray = [params.room_name];
+      // id is auto increment; ? escaping basically ....
+      var queryString = `INSERT INTO rooms (room_name) values(?);`;
+      db.query(queryString, paramsArray, (error, results) => {
+        if (error) {
+          console.log('Error inside models POST rooms: ', error);
+          callback(error, null);
+        } else {
+          console.log('Successfully able to POST rooms to DB inside models: 🆙👑', results);
+          callback(null, results);
+        }
+      });
+
+    }
   }
+
 };
 
 

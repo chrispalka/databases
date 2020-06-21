@@ -100,4 +100,90 @@ describe('Persistent Node Chat Server', function() {
       });
     });
   });
+
+  it('The initial counts of rows in the rooms should be 2', function(done) {
+    // Post the user to the chat server.
+    request({
+      method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/rooms',
+      json: { room_name: 'Arts' }
+    }, function () {
+      // Post a message to the node chat server:
+      request({
+        method: 'POST',
+        uri: 'http://127.0.0.1:3000/classes/rooms',
+        json: {
+          "room_name": "Museums"
+          /* username: 'Valjean',
+          text: 'In mercy\'s name, three days is all I need.',
+          roomname: 'Hello' */
+        }
+      }, function () {
+        // Now if we look in the database, we should find the
+        // posted message there.
+
+        // TODO: You might have to change this test to get all the data from
+        // your message table, since this is schema-dependent.
+        var queryString = 'SELECT count(room_name) FROM rooms;';
+        var queryArgs = [];
+
+        dbConnection.query(queryString, queryArgs, function(err, results) {
+          console.log('QUERY STRING ROOM!: ', queryString);
+          console.log('QUERY ARGS ROOMS!: ', queryArgs);
+          console.log('Results rooms: ', results);
+          if (err) {
+            throw new Error('ERROR!', err);
+          }
+
+          expect(results[0]['count(room_name)']).to.equal(2);
+
+          done();
+        });
+      });
+    });
+  });
+
+  it('Should not insert duplicate room names', function(done) {
+    // Post the user to the chat server.
+    request({
+      method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/rooms',
+      json: { room_name: 'Arts' }
+    }, function () {
+      // Post a message to the node chat server:
+      request({
+        method: 'POST',
+        uri: 'http://127.0.0.1:3000/classes/rooms',
+        json: {
+          "room_name": "Arts"
+          /* username: 'Valjean',
+          text: 'In mercy\'s name, three days is all I need.',
+          roomname: 'Hello' */
+        }
+      }, function () {
+        // Now if we look in the database, we should find the
+        // posted message there.
+
+        // TODO: You might have to change this test to get all the data from
+        // your message table, since this is schema-dependent.
+        var queryString = 'SELECT * FROM rooms;';
+        var queryArgs = [];
+
+        dbConnection.query(queryString, queryArgs, function(err, results) {
+          console.log('QUERY STRING ROOM!: ', queryString);
+          console.log('QUERY ARGS ROOMS!: ', queryArgs);
+          console.log('Results rooms: ', results);
+          if (err) {
+            throw new Error('ERROR!', err);
+          }
+
+          expect(results.length).to.equal(2);
+
+          done();
+        });
+      });
+    });
+  });
+
+
 });

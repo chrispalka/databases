@@ -53,6 +53,33 @@ module.exports = {
         res.end();
       });
     }
+  },
+
+  rooms: {
+    // Ditto as above
+    get: function (req, res) {
+      models.rooms.get((error, rooms) => {
+        if (error) {
+          console.log('Failed to get rooms inside controllers: ', error);
+        } else {
+          console.log('Successfully able to get rooms inside controllers: ', rooms);
+          res.json(rooms);
+          res.status(200).send();
+        }
+      });
+
+    },
+    post: function (req, res) {
+      console.log('Request body inside room post: ', req.body);
+      models.rooms.post(req.body, (error, rooms) => {
+        if (error) {
+          res.status(400).send(error);
+        } else {
+          res.status(201).send(rooms);
+        }
+        res.end();
+      });
+    }
   }
 };
 

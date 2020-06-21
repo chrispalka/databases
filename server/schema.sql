@@ -53,7 +53,7 @@ DROP TABLE IF EXISTS `rooms`;
 
 CREATE TABLE `rooms` (
   `id` INTEGER NOT NULL AUTO_INCREMENT,
-  `room_name` VARCHAR(25) NOT NULL,
+  `room_name` VARCHAR(25) NOT NULL UNIQUE,
   PRIMARY KEY (`id`)
 );
 
