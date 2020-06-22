@@ -1,80 +1,107 @@
 /* You'll need to have MySQL running and your Node server running
  * for these tests to pass. */
 
+var mysql = require('mysql');
 var request = require('request'); // You might need to npm install the request module!
-// var Sequelize = require('sequelize');
-var db = require('../db');
 var expect = require('chai').expect;
 
-describe('Persistent Node Chat Server', function () {
-  beforeEach(function() {
-    db.Messages.destroy({ truncate: true });
+describe('Persistent Node Chat Server', function() {
+  var dbConnection;
+
+  beforeEach(function(done) {
+    dbConnection = mysql.createConnection({
+      user: 'root',
+      password: '',
+      database: 'chat'
+    });
+    dbConnection.connect();
+
+       var tablename = "messages"; // TODO: fill this out
+
+    /* Empty the db table before each test so that multiple tests
+     * (or repeated runs of the tests) won't screw each other up: */
+    dbConnection.query('truncate ' + tablename, done);
   });
 
+  afterEach(function() {
+    dbConnection.end();
+  });
 
-  /* afterEach(function() {
-    db.close();
-  }); */
-
-  it('Should insert posted messages to the DB', function (done) {
+  it('Should insert posted messages to the DB', function(done) {
     // Post the user to the chat server.
     request({
       method: 'POST',
       uri: 'http://127.0.0.1:3000/classes/users',
-      json: { user_name: 'Test room' }
+      json: { user_name: 'Valjean' }
     }, function () {
       // Post a message to the node chat server:
       request({
         method: 'POST',
         uri: 'http://127.0.0.1:3000/classes/messages',
         json: {
-          "text": "Testing from the spec",
+          "text": "In mercy\'s name, three days is all I need.",
           "user_id": 3,
           "room_id": 3
-
+          /* username: 'Valjean',
+          text: 'In mercy\'s name, three days is all I need.',
+          roomname: 'Hello' */
         }
       }, function () {
+        // Now if we look in the database, we should find the
+        // posted message there.
 
-        db.Messages.findAll({
-          where: {
-            "user_id": 3
+        // TODO: You might have to change this test to get all the data from
+        // your message table, since this is schema-dependent.
+        var queryString = 'SELECT * FROM messages';
+        var queryArgs = [];
+
+        dbConnection.query(queryString, queryArgs, function(err, results) {
+          console.log('QUERY STRING!: ', queryString);
+          console.log('QUERY ARGS!: ', queryArgs);
+          if (err) {
+            throw new Error('ERROR!', err);
           }
-        }).then((messages) => {
-          console.log('MESSAGES', messages[0].dataValues);
-          expect(messages.length).to.equal(1);
-          expect(messages[0].dataValues.text).to.equal('Testing from the spec');
-        }).catch((e) => {
-          throw new Error('Error! ', e)
+          // Should have one result:
+          expect(results.length).to.equal(1);
+
+          // TODO: If you don't have a column named text, change this test.
+          expect(results[0].text).to.equal('In mercy\'s name, three days is all I need.');
+
+          done();
         });
-        done();
       });
     });
   });
 
-
   it('Should output all messages from the DB', function(done) {
-    db.Messages.create({
-      user_id: 1,
-      text: 'Message to DB!',
-      room_id: 2
-    });
+    // Let's insert a message into the db
+       var queryString = `INSERT INTO messages (id, text, user_id, room_id) values (?, ?, ?, ?)`; // values(${queryArgs})`
+       var queryArgs = [1, 'Men like you can never change!', 1, 1];
+    // TODO - The exact query string and query args to use
+    // here depend on the schema you design, so I'll leave
+    // them up to you. */
 
+    dbConnection.query(queryString, queryArgs, function(err) {
+      if (err) { throw err; }
+
+      // Now query the Node chat server and see if it returns
+      // the message we just inserted:
       request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+
         if (error) {
           console.log('Error should output all db messages:', error);
         }
-        console.log('Response ----', response);
+        console.log('Body ----', body);
         var messageLog = JSON.parse(body);
         console.log('messageLogs: ----->', messageLog);
-        expect(messageLog[0].text).to.equal('Message to DB!');
-        expect(messageLog[0].user_id).to.equal(1);
-        expect(messageLog[0].room_id).to.equal(2);
-        expect(response.statusCode).to.equal(200);
+        expect(messageLog[0].text).to.equal('Men like you can never change!');
+        expect(messageLog[0].room_id).to.equal(1);
         done();
       });
+    });
   });
 
-  xit('The initial counts of rows in the rooms should be 2', function (done) {
+  it('The initial counts of rows in the rooms should be 2', function(done) {
     // Post the user to the chat server.
     request({
       method: 'POST',
@@ -100,7 +127,7 @@ describe('Persistent Node Chat Server', function () {
         var queryString = 'SELECT count(room_name) FROM rooms;';
         var queryArgs = [];
 
-        dbConnection.query(queryString, queryArgs, function (err, results) {
+        dbConnection.query(queryString, queryArgs, function(err, results) {
           console.log('QUERY STRING ROOM!: ', queryString);
           console.log('QUERY ARGS ROOMS!: ', queryArgs);
           console.log('Results rooms: ', results);
@@ -116,7 +143,7 @@ describe('Persistent Node Chat Server', function () {
     });
   });
 
-  xit('Should not insert duplicate room names', function (done) {
+  it('Should not insert duplicate room names', function(done) {
     // Post the user to the chat server.
     request({
       method: 'POST',
@@ -142,7 +169,7 @@ describe('Persistent Node Chat Server', function () {
         var queryString = 'SELECT * FROM rooms;';
         var queryArgs = [];
 
-        dbConnection.query(queryString, queryArgs, function (err, results) {
+        dbConnection.query(queryString, queryArgs, function(err, results) {
           console.log('QUERY STRING ROOM!: ', queryString);
           console.log('QUERY ARGS ROOMS!: ', queryArgs);
           console.log('Results rooms: ', results);
